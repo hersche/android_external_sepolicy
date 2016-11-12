@@ -37,6 +37,13 @@ allow zygote dex2oat_exec:file rx_file_perms;
 # Control cgroups.
 allow zygote cgroup:dir create_dir_perms;
 allow zygote self:capability sys_admin;
+# Allow zygote to stat the files that it opens. The zygote must
+# be able to inspect them so that it can reopen them on fork
+# if necessary: b/30963384
+# allow zygote pmsg_device:chr_file { getattr };
+allow zygote debugfs:dir search;
+allow zygote debugfs:file { getattr };
+
 # Check validity of SELinux context before use.
 selinux_check_context(zygote)
 # Check SELinux permissions.
@@ -56,6 +63,7 @@ allow zygote tmpfs:dir { write create add_name setattr mounton search }; # TODO:
 allow zygote tmpfs:filesystem { mount unmount };
 allow zygote fuse:filesystem { unmount };
 allow zygote labeledfs:filesystem remount; # TODO: deprecated in M
+allow zygote sdcardfs:filesystem { unmount };
 
 # Allowed to create user-specific storage source if started before vold
 allow zygote mnt_user_file:dir create_dir_perms;
